@@ -22,19 +22,30 @@ public class AccountCreationController  {
     public Account UserRegistration(@RequestBody Account account){
         return usr.save(account);
     }
-    @PutMapping("/debit")
-    public Account debit(@RequestParam Integer balance,@RequestParam Integer accountNo){
+    @PutMapping("/debit/{accountNo}/{balance}")
+    public Account debit(@PathVariable("balance") Integer balance,@PathVariable("accountNo") Integer accountNo){
         Optional<Account> account=usr.findById(accountNo);
         if(account.isPresent()){
             Account a=account.get();
-            a.setBalance(a.getBalance()-balance);
-            return a;
+            if(a.getBalance()>balance) {
+                a.setBalance(a.getBalance() - balance);
+                return a;
+            }
+            else
+                throw new RuntimeException("Insufficient Balance.");
         }
         else
             throw new RuntimeException("Account Not Found");
     }
-    @PutMapping("/credit")
-    public String credit(@RequestParam Integer balance){
-        return "Balance has been added Successfully";
+    @PutMapping("/credit/{accountNo}/{balance}")
+    public Account credit(@PathVariable("balance") Integer balance,@PathVariable("accountNo") Integer accountNo){
+        Optional<Account> account=usr.findById(accountNo);
+        if(account.isPresent()){
+            Account a=account.get();
+            a.setBalance(a.getBalance()+balance);
+            return usr.save(a);
+        }
+        else
+            throw new RuntimeException("Account Not Found");
     }
 }
