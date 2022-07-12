@@ -29,6 +29,7 @@ public class AccountCreationController  {
             Account a=account.get();
             if(a.getBalance()>balance) {
                 a.setBalance(a.getBalance() - balance);
+                usr.save(a);
                 return a;
             }
             else
